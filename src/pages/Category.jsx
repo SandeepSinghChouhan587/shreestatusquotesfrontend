@@ -38,7 +38,7 @@ const Category = () => {
     try {
       if (pageNum === 1) setLoading(true);
       const res = await axios.get(
-        `/api/quotes/category/${selectedCategory}?page=${pageNum}`
+        `${import.meta.env.VITE_API_URL}/api/quotes/category/${selectedCategory}?page=${pageNum}`
       );
 
       if (pageNum === 1) {

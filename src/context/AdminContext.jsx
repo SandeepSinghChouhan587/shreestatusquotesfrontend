@@ -9,7 +9,7 @@ const AdminProvider = ({ children }) => {
   );
 
   const login = async (form) => {
-    const res = await axios.post("/api/admin/login", form);
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/login`, form);
     if(res.data.success){
       localStorage.setItem("token", res.data.token);
       setAdmin(true);

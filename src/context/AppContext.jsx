@@ -28,7 +28,7 @@ const AppProvider = ({ children }) => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `/api/quotes/paginated?page=${page}`
+        `${import.meta.env.VITE_API_URL}/api/quotes/paginated?page=${page}`
       );
 
       if (res.data.length === 0) {
@@ -54,7 +54,7 @@ const AppProvider = ({ children }) => {
   /* ---------------- LIKE ---------------- */
   const likeQuote = async (id, type = "increase") => {
     try {
-      await axios.put(`/api/quotes/like/${id}`, { type });
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/quotes/like/${id}`, { type });
 
       setQuotes((prev) =>
         prev.map((q) =>
@@ -74,7 +74,8 @@ const AppProvider = ({ children }) => {
   /* ---------------- DOWNLOAD ---------------- */
   const downloadQuote = async (id) => {
     try {
-      await axios.put(`/api/quotes/download/${id}`);
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/quotes/download/${id}`);
+     
     } catch (err) {
       console.error("Download error");
     }
@@ -83,7 +84,7 @@ const AppProvider = ({ children }) => {
   /* ---------------- SHARE ---------------- */
   const shareQuote = async (id) => {
     try {
-      await axios.put(`/api/quotes/share/${id}`);
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/quotes/share/${id}`);
     } catch (err) {
       console.error("Share error");
     }

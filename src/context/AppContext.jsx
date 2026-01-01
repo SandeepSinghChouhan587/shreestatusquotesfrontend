@@ -31,7 +31,7 @@ const AppProvider = ({ children }) => {
         `${import.meta.env.VITE_API_URL}/api/quotes/paginated?page=${page}`
       );
 
-      if (res.data.length === 0) {
+      if (res.data.length < 6) {
         setHasMore(false);
       } else {
        setQuotes((prev) => {

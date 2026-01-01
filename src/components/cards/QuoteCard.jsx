@@ -60,7 +60,7 @@ const QuoteCard = ({ quote,onLikeUpdate }) => {
     try {
       setDownloading(true);
 
-      const res = await fetch("/api/download", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/download`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ imageUrl }),
@@ -85,24 +85,23 @@ const QuoteCard = ({ quote,onLikeUpdate }) => {
   };
 
   /* ---------------- SHARE ---------------- */
-  const handleShare = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: "Quote",
-          text: quote.text,
-          url: quote.image,
-        });
-      } else {
-        await navigator.clipboard.writeText(
-          `${quote.text}\n${quote.image}`
-        );
-      }
-      shareQuote(quote._id);
-    } catch {
-      toast.error("Sharing failed");
-    }
-  };
+const handleShare = async () => {
+  const shareUrl = `${import.meta.env.VITE_SITE_URL}/quote/${quote._id}`;
+
+  if (navigator.share) {
+    await navigator.share({
+      title: "Quote",
+      text: quote.text,
+      url: shareUrl
+    });
+  } else {
+    await navigator.clipboard.writeText(
+      `${quote.text}\n${shareUrl}`
+    );
+  }
+
+  await shareQuote(quote._id);
+};
 
   const words = quote.text.split(" ");
   const truncated =

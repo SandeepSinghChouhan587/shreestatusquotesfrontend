@@ -3,6 +3,7 @@ import { AppContext } from "../context/AppContext";
 import QuoteCard from "../components/cards/QuoteCard";
 import Loader from "../components/common/Loader";
 import Hero from "../components/common/Hero";
+import { Helmet } from "react-helmet-async";
 
 const Home = () => {
   const { quotes, fetchMoreQuotes, loading, searchQuery } = useContext(AppContext);
@@ -39,6 +40,15 @@ useEffect(() => {
 
   return (
     <>
+    <Helmet>
+    
+  <title>Shree Status Quotes – Best Hindi , Hinglish , English & Motivational Quotes</title>
+  <meta
+    name="description"
+    content="Best Hindi quotes, Hinglish quotes , English quotes , motivational thoughts, love status, bhakti quotes & daily inspiration. Free download and share."
+  />
+  <meta name="google-site-verification" content="fYqA_X96iJCgP9b0_KhFvZ3gKMGqVlFaLafI9wKj0Qw" />
+    </Helmet>
       <Hero />
 
      <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mx-auto w-full">

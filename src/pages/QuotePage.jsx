@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import QuoteCard from "../components/cards/QuoteCard"; 
+import { Helmet } from "react-helmet-async";
 
 const QuotePage = () => {
   const { id } = useParams();
@@ -29,9 +30,18 @@ const QuotePage = () => {
   if (!quote) return <p>Quote not found</p>;
 
   return (
+    <>
+    <Helmet>
+  <title>{quote.text.slice(0, 60)}...</title>
+  <meta
+    name="description"
+    content={quote.text}
+  />
+  </Helmet>
     <div style={{ maxWidth: "500px", margin: "auto" }}>
       <QuoteCard quote={quote} />
     </div>
+    </>
   );
 };
 

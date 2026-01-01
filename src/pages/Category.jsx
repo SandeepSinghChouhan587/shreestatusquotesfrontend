@@ -3,6 +3,7 @@ import axios from "axios";
 import QuoteCard from "../components/cards/QuoteCard";
 import Loader from "../components/common/Loader";
 import { AppContext } from "../context/AppContext";
+import { Helmet } from "react-helmet-async";
 
 const Category = () => {
   const [category, setCategory] = useState("newyear");
@@ -111,6 +112,15 @@ const updateLikeLocally = (quoteId, type) => {
   });
 
   return (
+    <>
+    <Helmet>
+  <title>{category} Quotes | Shree Status Quotes</title>
+  <meta
+    name="description"
+    content={`Best ${category} quotes in Hindi, Hinglish and English with images. Download and share for free.`}
+  />
+  </Helmet>
+
     <section className="min-h-screen w-full bg-gradient-to-br from-indigo-800 via-purple-700 to-pink-600 px-4 md:px-12 py-12">
 
       {/* Heading */}
@@ -186,6 +196,7 @@ const updateLikeLocally = (quoteId, type) => {
 
       {fetchingMore && <div className="flex justify-center my-8"><Loader /></div>}
     </section>
+    </>
   );
 };
 

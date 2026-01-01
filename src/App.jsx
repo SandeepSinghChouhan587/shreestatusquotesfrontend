@@ -9,6 +9,7 @@ import Category from "./pages/Category";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
+import QuotePage from "./pages/QuotePage";
 
 import Login from "./admin/pages/Login";
 import Dashboard from "./admin/pages/Dashboard";
@@ -40,6 +41,8 @@ function App() {
                   <Route path="/about" element={<About />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/terms" element={<Terms />} />
+                  <Route path="/quote/:id" element={<QuotePage />} />
+
 
                   {/* Admin Login */}
                   <Route path="/admin" element={<Login />} />

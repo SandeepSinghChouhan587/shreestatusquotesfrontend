@@ -7,6 +7,9 @@ import Hero from "../components/common/Hero";
 const Home = () => {
   const { quotes, fetchMoreQuotes, loading, searchQuery } = useContext(AppContext);
   const [isFetching, setIsFetching] = useState(false);
+useEffect(() => {
+  fetchMoreQuotes(); 
+}, []);
 
   // Infinite scroll
   useEffect(() => {
@@ -15,7 +18,7 @@ const Home = () => {
         window.innerHeight + document.documentElement.scrollTop + 100 >=
         document.documentElement.scrollHeight
       ) {
-        if (!isFetching) {
+        if (!isFetching && !loading) {
           setIsFetching(true);
           fetchMoreQuotes().finally(() => setIsFetching(false));
         }
@@ -24,7 +27,7 @@ const Home = () => {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isFetching, fetchMoreQuotes]);
+  }, [isFetching, loading]);
 
   const filteredQuotes = quotes.filter((q) => {
     const query = searchQuery.toLowerCase();

@@ -11,7 +11,7 @@ const QuotePage = () => {
     const fetchQuote = async () => {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/quote/${id}`
+          `${import.meta.env.VITE_API_URL}/api/quotes/${id}`
         );
         const data = await res.json();
         setQuote(data);

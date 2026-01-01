@@ -47,7 +47,6 @@ useEffect(() => {
     name="description"
     content="Best Hindi quotes, Hinglish quotes , English quotes , motivational thoughts, love status, bhakti quotes & daily inspiration. Free download and share."
   />
-  <meta name="google-site-verification" content="fYqA_X96iJCgP9b0_KhFvZ3gKMGqVlFaLafI9wKj0Qw" />
     </Helmet>
       <Hero />
 

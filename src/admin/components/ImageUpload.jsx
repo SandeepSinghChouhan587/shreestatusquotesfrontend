@@ -2,22 +2,34 @@ import { useState, useRef } from "react";
 import axios from "axios";
 import { getUploadUrl } from "../../api/upload";
 
-const ImageUpload = ({ onUpload }) => {
+// 🔹 SEO File Name Generator
+const generateImageName = (text, category) => {
+  const year = new Date().getFullYear();
+
+  const slugify = (str) =>
+    str
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-");
+
+  return `${slugify(text)}-${slugify(category)}-${year}.webp`;
+};
+
+const ImageUpload = ({ onUpload, text, category }) => {
   const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef(null);
 
-  // 🔹 Compress image to WEBP
+  // 🔹 Compress Image
   const compressImage = (file) => {
     return new Promise((resolve) => {
       const img = new Image();
       const reader = new FileReader();
 
-      reader.onload = (e) => {
-        img.src = e.target.result;
-      };
+      reader.onload = (e) => (img.src = e.target.result);
 
       img.onload = () => {
         const canvas = document.createElement("canvas");
@@ -34,7 +46,7 @@ const ImageUpload = ({ onUpload }) => {
         canvas.toBlob(
           (blob) => resolve(blob),
           "image/webp",
-          0.8 // ✅ best quality/size balance
+          0.8
         );
       };
 
@@ -42,102 +54,68 @@ const ImageUpload = ({ onUpload }) => {
     });
   };
 
-  // 🔹 Upload Handler
+  // 🔹 Upload
   const handleUpload = async (file) => {
-    if (!file) return;
+    if (!file || !text || !category) {
+      alert("Please enter quote text and category first");
+      return;
+    }
 
     try {
       setLoading(true);
-      setProgress(0);
-
-      // preview
       setPreview(URL.createObjectURL(file));
 
-      // compress image
       const compressed = await compressImage(file);
 
-      // get signed url
-      const { uploadURL, fileUrl } = await getUploadUrl("image/webp");
+      // ✅ Generate SEO filename
+      const fileName = generateImageName(text, category);
 
-      // upload to S3
+      // 🔹 Get signed URL
+      const { uploadURL, fileUrl } = await getUploadUrl(
+        "image/webp",
+        fileName
+      );
+
+      // 🔹 Upload to S3
       await axios.put(uploadURL, compressed, {
-        headers: {
-          "Content-Type": "image/webp",
-        },
+        headers: { "Content-Type": "image/webp" },
         onUploadProgress: (e) => {
-          const percent = Math.round((e.loaded * 100) / e.total);
-          setProgress(percent);
+          setProgress(Math.round((e.loaded * 100) / e.total));
         },
       });
 
       onUpload(fileUrl);
-    } catch (error) {
-      console.error("Upload failed:", error);
-      alert("Image upload failed");
-      setPreview("");
+    } catch (err) {
+      console.error(err);
+      alert("Upload failed");
     } finally {
       setLoading(false);
       setProgress(0);
     }
   };
 
-  // drag & drop
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragOver(false);
-    if (e.dataTransfer.files.length > 0) {
-      handleUpload(e.dataTransfer.files[0]);
-    }
-  };
-
   return (
-    <div className="space-y-3 text-black">
-      {/* Drop Area */}
+    <div className="space-y-3">
       <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragOver(true);
-        }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={handleDrop}
         onClick={() => inputRef.current.click()}
-        className={`w-full border-2 border-dashed rounded-lg px-4 py-6 text-center cursor-pointer transition 
-        ${dragOver ? "border-indigo-600 bg-indigo-50/20" : "border-gray-300 bg-white/10"}`}
+        className="border-dashed border-2 p-5 text-center cursor-pointer"
       >
-        {loading ? (
-          <p className="text-indigo-600 font-medium">
-            Uploading... {progress}%
-          </p>
-        ) : (
-          <p>
-            {preview
-              ? "Click or Drag & Drop to change image"
-              : "Click or Drag & Drop to upload image"}
-          </p>
-        )}
+        {loading ? `Uploading... ${progress}%` : "Click or drop image"}
       </div>
 
-      {/* Hidden Input */}
       <input
-        type="file"
         ref={inputRef}
-        className="hidden"
+        type="file"
+        hidden
         accept="image/*"
         onChange={(e) => handleUpload(e.target.files[0])}
       />
 
-      {/* Preview */}
-      {preview && !loading && (
-        <>
-          <img
-            src={preview}
-            alt="preview"
-            className="w-full max-h-60 object-cover rounded-lg shadow-md"
-          />
-          <p className="text-green-500 text-sm">
-            Image uploaded successfully
-          </p>
-        </>
+      {preview && (
+        <img
+          src={preview}
+          className="w-full max-h-60 object-cover rounded"
+        />
       )}
     </div>
   );

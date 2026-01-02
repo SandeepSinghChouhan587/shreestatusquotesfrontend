@@ -61,15 +61,27 @@ const AddQuote = () => {
             onChange={(e) => setCategory(e.target.value)}
           />
 
-          <ImageUpload onUpload={(url) => setImageUrl(url)} />
+          <ImageUpload
+            text={text}
+            category={category}
+            onUpload={(url) => setImageUrl(url)}
+          />
 
           <button
-            className="w-full bg-indigo-600 text-white py-3 rounded"
+            className="w-full hover:bg-indigo-800 bg-indigo-600 text-white py-3 rounded"
             disabled={loading}
           >
             {loading ? "Saving..." : "Add Quote"}
           </button>
+
         </form>
+          <button
+          type="submit"
+            className="w-full mt-5  bg-violet-600 hover:bg-violet-800 text-white py-3 rounded"
+           onClick={()=>{navigate("/admin/dashboard")}}
+          >
+            Go To Dashboard
+          </button>
       </div>
     </div>
   );

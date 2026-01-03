@@ -138,21 +138,34 @@ const QuotePage = () => {
         <meta name="description" content={quote.text} />
       </Helmet>
 
-      <div style={{ maxWidth: "500px", margin: "auto" }}>
-        {/* MAIN SHARED QUOTE */}
-        <QuoteCard quote={quote} />
+    <div className="w-full max-w-7xl mx-auto">
+  {/* MAIN SHARED QUOTE */}
+  <div className="mx-5 md:mx-0 mb-8">
+    <QuoteCard quote={quote} />
+  </div>
 
-        {/* RELATED QUOTES */}
-        <h3 style={{ margin: "20px 0" }}>
-          Similar {displayCategory} Quotes
-        </h3>
+  {/* RELATED QUOTES HEADING */}
+  <h3 className="mx-5 md:mx-0 mb-6 text-lg font-semibold text-gray-800">
+    Similar {displayCategory} Quotes
+  </h3>
 
-        {relatedQuotes.map((q) => (
-          <QuoteCard key={q._id} quote={q} />
-        ))}
-
-        {fetchingMore && <Loader />}
+  {/* RELATED QUOTES GRID */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {relatedQuotes.map((q) => (
+      <div key={q._id} className="mx-5 sm:mx-0">
+        <QuoteCard quote={q} />
       </div>
+    ))}
+  </div>
+
+  {/* LOADER */}
+  {fetchingMore && (
+    <div className="flex justify-center my-6">
+      <Loader />
+    </div>
+  )}
+</div>
+
     </>
   );
 };

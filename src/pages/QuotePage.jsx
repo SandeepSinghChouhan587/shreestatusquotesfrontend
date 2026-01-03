@@ -33,34 +33,38 @@ const QuotePage = () => {
 
     fetchQuote();
   }, [id]);
+  
+const resolveBaseCategory = (slug = "") => {
+  if (!slug) return "";
 
-  // 🔹 Fetch related quotes (same category)
-  const fetchRelatedQuotes = async (pageNum = 1) => {
-    if (!quote?.category) return;
+  // lowercase + split
+  const parts = slug.toLowerCase().split("-");
 
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/quotes/category/${
-          quote.category
-        }?page=${pageNum}`
-      );
+  // remove junk words if needed
+  const stopWords = ["quotes", "quote", "hindi", "english"];
 
-      // 🔥 remove current quote from list
-      const filtered = res.data.filter((q) => q._id !== quote._id);
+  const base = parts.find((word) => !stopWords.includes(word));
 
-      if (pageNum === 1) {
-        setRelatedQuotes(filtered);
-      } else {
-        setRelatedQuotes((prev) => [...prev, ...filtered]);
-      }
+  return base || parts[0];
+};
 
-      if (res.data.length === 0) setHasMore(false);
-    } catch (err) {
-      console.error("Failed to load related quotes", err);
-    } finally {
-      setFetchingMore(false);
-    }
-  };
+const baseCategory = resolveBaseCategory(quote.category);
+
+const fetchRelatedQuotes = async (pageNum = 1) => {
+  if (!baseCategory) return;
+
+  const res = await axios.get(
+    `${import.meta.env.VITE_API_URL}/api/quotes/category/${baseCategory}?page=${pageNum}`
+  );
+
+  const filtered = res.data.filter((q) => q._id !== quote._id);
+
+  if (pageNum === 1) setRelatedQuotes(filtered);
+  else setRelatedQuotes((prev) => [...prev, ...filtered]);
+
+  if (res.data.length === 0) setHasMore(false);
+};
+
 
   // 🔹 First load related quotes
   useEffect(() => {

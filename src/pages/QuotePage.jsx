@@ -16,7 +16,28 @@ const QuotePage = () => {
   const [hasMore, setHasMore] = useState(true);
   const [fetchingMore, setFetchingMore] = useState(false);
 
-  // 🔹 Fetch single shared quote
+  /* ----------------------------------
+     CATEGORY RESOLVER
+  ---------------------------------- */
+  const resolveBaseCategory = (category) => {
+    if (!category) return "";
+
+    // category array ho to first lo
+    const slug = Array.isArray(category) ? category[0] : category;
+    if (!slug) return "";
+
+    const parts = slug.toLowerCase().split("-");
+
+    const stopWords = ["quotes", "quote", "hindi", "english"];
+
+    const base = parts.find((w) => !stopWords.includes(w));
+
+    return base || parts[0];
+  };
+
+  /* ----------------------------------
+     FETCH SINGLE QUOTE
+  ---------------------------------- */
   useEffect(() => {
     const fetchQuote = async () => {
       try {
@@ -33,40 +54,41 @@ const QuotePage = () => {
 
     fetchQuote();
   }, [id]);
-  
-const resolveBaseCategory = (slug = "") => {
-  if (!slug) return "";
 
-  // lowercase + split
-  const parts = slug.toLowerCase().split("-");
+  /* ----------------------------------
+     FETCH RELATED QUOTES
+  ---------------------------------- */
+  const fetchRelatedQuotes = async (pageNum = 1) => {
+    if (!quote || !quote.category) return;
 
-  // remove junk words if needed
-  const stopWords = ["quotes", "quote", "hindi", "english"];
+    const baseCategory = resolveBaseCategory(quote.category);
+    if (!baseCategory) return;
 
-  const base = parts.find((word) => !stopWords.includes(word));
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/quotes/category/${baseCategory}?page=${pageNum}`
+      );
 
-  return base || parts[0];
-};
+      // remove current quote
+      const filtered = res.data.filter((q) => q._id !== quote._id);
 
-const baseCategory = resolveBaseCategory(quote.category);
+      if (pageNum === 1) {
+        setRelatedQuotes(filtered);
+      } else {
+        setRelatedQuotes((prev) => [...prev, ...filtered]);
+      }
 
-const fetchRelatedQuotes = async (pageNum = 1) => {
-  if (!baseCategory) return;
+      if (res.data.length === 0) setHasMore(false);
+    } catch (err) {
+      console.error("Failed to load related quotes", err);
+    } finally {
+      setFetchingMore(false);
+    }
+  };
 
-  const res = await axios.get(
-    `${import.meta.env.VITE_API_URL}/api/quotes/category/${baseCategory}?page=${pageNum}`
-  );
-
-  const filtered = res.data.filter((q) => q._id !== quote._id);
-
-  if (pageNum === 1) setRelatedQuotes(filtered);
-  else setRelatedQuotes((prev) => [...prev, ...filtered]);
-
-  if (res.data.length === 0) setHasMore(false);
-};
-
-
-  // 🔹 First load related quotes
+  /* ----------------------------------
+     INITIAL LOAD OF RELATED QUOTES
+  ---------------------------------- */
   useEffect(() => {
     if (quote) {
       setPage(1);
@@ -75,7 +97,9 @@ const fetchRelatedQuotes = async (pageNum = 1) => {
     }
   }, [quote]);
 
-  // 🔹 Infinite scroll
+  /* ----------------------------------
+     INFINITE SCROLL
+  ---------------------------------- */
   useEffect(() => {
     const handleScroll = () => {
       if (
@@ -86,9 +110,9 @@ const fetchRelatedQuotes = async (pageNum = 1) => {
       ) {
         setFetchingMore(true);
         setPage((prev) => {
-          const next = prev + 1;
-          fetchRelatedQuotes(next);
-          return next;
+          const nextPage = prev + 1;
+          fetchRelatedQuotes(nextPage);
+          return nextPage;
         });
       }
     };
@@ -97,8 +121,15 @@ const fetchRelatedQuotes = async (pageNum = 1) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [hasMore, fetchingMore, quote]);
 
+  /* ----------------------------------
+     RENDER
+  ---------------------------------- */
   if (loading) return <Loader />;
   if (!quote) return <p>Quote not found</p>;
+
+  const displayCategory = Array.isArray(quote.category)
+    ? quote.category[0]
+    : quote.category;
 
   return (
     <>
@@ -108,11 +139,13 @@ const fetchRelatedQuotes = async (pageNum = 1) => {
       </Helmet>
 
       <div style={{ maxWidth: "500px", margin: "auto" }}>
-        {/* 🔥 MAIN SHARED QUOTE */}
+        {/* MAIN SHARED QUOTE */}
         <QuoteCard quote={quote} />
 
-        {/* 🔹 Related Quotes */}
-        <h3 style={{ margin: "20px 0" }}>Similar {quote.category} Quotes</h3>
+        {/* RELATED QUOTES */}
+        <h3 style={{ margin: "20px 0" }}>
+          Similar {displayCategory} Quotes
+        </h3>
 
         {relatedQuotes.map((q) => (
           <QuoteCard key={q._id} quote={q} />

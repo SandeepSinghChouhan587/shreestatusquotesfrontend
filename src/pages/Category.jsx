@@ -6,7 +6,7 @@ import { AppContext } from "../context/AppContext";
 import { Helmet } from "react-helmet-async";
 
 const Category = () => {
-  const [category, setCategory] = useState("newyear");
+  const [category, setCategory] = useState("hindi");
   const [quotes, setQuotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -17,7 +17,7 @@ const Category = () => {
   // 🔹 Spotlight guide state
   const [showGuide, setShowGuide] = useState(false);
   const switchRef = useRef(null);
-  const [spotlightStyle, setSpotlightStyle] = useState({});
+
 
   const { searchQuery } = useContext(AppContext);
 
@@ -40,24 +40,10 @@ const Category = () => {
     "spiritual",
   ];
 
-  // 🔹 Show guide only once
+
   useEffect(() => {
-    const seen = localStorage.getItem("category_switch_guide_seen");
-    if (!seen) setShowGuide(true);
+      setShowGuide(true);
   }, []);
-
-  // 🔹 Calculate spotlight position
-  useEffect(() => {
-    if (showGuide && switchRef.current) {
-      const rect = switchRef.current.getBoundingClientRect();
-
-      setSpotlightStyle({
-        "--x": `${rect.left + rect.width / 2}px`,
-        "--y": `${rect.top + rect.height / 2}px`,
-        "--r": `${Math.max(rect.width, rect.height) / 2 + 20}px`,
-      });
-    }
-  }, [showGuide]);
 
   const hideGuide = () => {
     localStorage.setItem("category_switch_guide_seen", "true");
@@ -138,22 +124,6 @@ const Category = () => {
         />
       </Helmet>
 
-      {/* 🔹 Spotlight Overlay */}
-      {showGuide && (
-        <div
-          className="fixed inset-0 z-40 pointer-events-none"
-          style={{
-            background: `
-              radial-gradient(
-                circle var(--r) at var(--x) var(--y),
-                transparent 0%,
-                rgba(0,0,0,0.85) 100%
-              )
-            `,
-            ...spotlightStyle,
-          }}
-        />
-      )}
 
       <section className="min-h-screen w-full bg-gradient-to-br from-indigo-800 via-purple-700 to-pink-600 px-4 md:px-12 py-12 relative z-10">
 
@@ -178,7 +148,7 @@ const Category = () => {
 
           {/* 🔹 Guide Bubble */}
           {showGuide && (
-            <div className="absolute -top-14 left-4 z-50 animate-pulse">
+            <div className="absolute -top-5 left-4 z-50 animate-pulse">
               <div className="relative bg-black text-white text-xs px-3 py-2 rounded-md shadow-lg">
                 Tap here to choose category
                 <div className="absolute left-4 -bottom-2 w-0 h-0

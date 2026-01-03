@@ -71,11 +71,10 @@ const ImageUpload = ({ onUpload, text, category }) => {
       const fileName = generateImageName(text, category);
 
       // 🔹 Get signed URL
-      const { uploadURL, fileUrl } = await getUploadUrl(
-        "image/webp",
-        fileName
-      );
-
+     const { uploadURL, fileUrl } = await getUploadUrl({
+  fileType: "image/webp",
+  fileName: fileName,
+});
       // 🔹 Upload to S3
       await axios.put(uploadURL, compressed, {
         headers: { "Content-Type": "image/webp" },
